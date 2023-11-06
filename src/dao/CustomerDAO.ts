@@ -22,4 +22,16 @@ export class CustomerDAO {
     );
     return result;
   }
+
+  public async getCustomer(id: string) {
+    const result = await this.client.query(
+      `
+        SELECT * FROM customers
+        WHERE customer_id = $1
+        `,
+      [id]
+    );
+
+    return result.rows;
+  }
 }
