@@ -1,26 +1,24 @@
 import { PoolClient } from "pg";
+import { Customer, ICustomerDAO } from "../interfaces/ICustomerDAO";
 
-export class CustomerDAO {
+export class CustomerDAO implements ICustomerDAO {
   public client: PoolClient;
   constructor(client: PoolClient) {
     this.client = client;
   }
 
-  public async addCustomer(
-    displayName: string,
-    email: string,
-    telephone: string
-  ) {
+  public async addCustomer(customer: Customer) {
     const result = await this.client.query(
       `
             INSERT INTO customers (display_name, email, telephone)
             VALUES (
                 $1, $2, $3
             )
+            RETURNING customer_id
         `,
-      [displayName, email, telephone]
+      [customer.displayName, customer.email, customer.telephone]
     );
-    return result;
+    return result.rows[0].customer_id;
   }
 
   public async getCustomer(id: string) {
@@ -32,6 +30,6 @@ export class CustomerDAO {
       [id]
     );
 
-    return result.rows;
+    return result.rows[0];
   }
 }
